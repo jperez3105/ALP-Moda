@@ -147,21 +147,21 @@
   const contenedor = document.getElementById("productos");
   const buscador = document.getElementById("searchInput");
 
-  let listaProductos = [];
+  let listaproductos = [];
 
-  async function cargarProductos() {
+  async function cargarproductos() {
     const querySnapshot = await getDocs(collection(db, "productos"));
 
-    listaProductos = [];
+    listaproductos = [];
 
     querySnapshot.forEach((doc) => {
-      listaProductos.push(doc.data());
+      listaproductos.push(doc.data());
     });
 
-    mostrarProductos(listaProductos);
+    mostrarproductos(listaproductos);
   }
 
-  function mostrarProductos(productos) {
+  function mostrarproductos(productos) {
     contenedor.innerHTML = "";
 
     productos.forEach((p) => {
@@ -185,14 +185,14 @@
   buscador.addEventListener("keyup", function() {
     const filtro = buscador.value.toLowerCase();
 
-    const filtrados = listaProductos.filter(p =>
+    const filtrados = listaproductos.filter(p =>
       p.nombre.toLowerCase().includes(filtro)
     );
 
-    mostrarProductos(filtrados);
+    mostrarproductos(filtrados);
   });
 
-  cargarProductos();
+  cargarproductos();
 </script>
 
 </body>
