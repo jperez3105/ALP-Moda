@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -6,97 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background-color: #fff;
-    }
-
-    header {
-      text-align: center;
-      padding: 20px;
-      background-color: #000;
-      color: #fff;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 28px;
-      letter-spacing: 2px;
-    }
-
-    .subtitulo {
-      color: #f8c8dc;
-      font-size: 14px;
-    }
-
-    .buscador {
-      padding: 15px;
-      text-align: center;
-    }
-
-    .buscador input {
-      width: 90%;
-      max-width: 400px;
-      padding: 10px;
-      border-radius: 20px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-      padding: 15px;
-    }
-
-    .card {
-      border: 1px solid #eee;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    .card img {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-    }
-
-    .info {
-      padding: 10px;
-    }
-
-    .nombre {
-      font-size: 14px;
-      margin: 5px 0;
-    }
-
-    .precio {
-      color: #000;
-      font-weight: bold;
-    }
-
-    .boton {
-      display: block;
-      text-align: center;
-      margin-top: 10px;
-      padding: 8px;
-      background-color: #f8c8dc;
-      color: #000;
-      text-decoration: none;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-
-    .nota {
-      font-size: 12px;
-      color: gray;
-      margin-top: 5px;
-    }
-
+    body { font-family: Arial; margin: 0; background: #fff; }
+    header { text-align: center; padding: 20px; background: #000; color: #fff; }
+    .subtitulo { color: #f8c8dc; font-size: 14px; }
+    .buscador { padding: 15px; text-align: center; }
+    .buscador input { width: 90%; max-width: 400px; padding: 10px; border-radius: 20px; }
+    .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 15px; padding: 15px; }
+    .card { border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+    .card img { width: 100%; height: 220px; object-fit: cover; }
+    .info { padding: 10px; }
+    .precio { font-weight: bold; }
+    .boton { display: block; text-align: center; margin-top: 10px; padding: 8px; background: #f8c8dc; color: #000; text-decoration: none; }
   </style>
 </head>
 
@@ -111,23 +31,9 @@
   <input type="text" id="searchInput" placeholder="Buscar producto...">
 </div>
 
-<div class="container" id="productos">
-  </div>
+<div class="container" id="productos"></div>
 
-
-<script>
-  const buscador = document.getElementById("searchInput");
-
-
-  buscador.addEventListener("keyup", function() {
-    const filtro = buscador.value.toLowerCase();
-
-    productos.forEach(producto => {
-      const texto = producto.innerText.toLowerCase();
-      producto.style.display = texto.includes(filtro) ? "block" : "none";
-    });
-  });
-
+<!-- 🔥 FIREBASE FUNCIONAL -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -147,21 +53,21 @@
   const contenedor = document.getElementById("productos");
   const buscador = document.getElementById("searchInput");
 
-  let listaproductos = [];
+  let listaProductos = [];
 
-  async function cargarproductos() {
+  async function cargarProductos() {
     const querySnapshot = await getDocs(collection(db, "productos"));
 
-    listaproductos = [];
+    listaProductos = [];
 
     querySnapshot.forEach((doc) => {
-      listaproductos.push(doc.data());
+      listaProductos.push(doc.data());
     });
 
-    mostrarproductos(listaproductos);
+    mostrarProductos(listaProductos);
   }
 
-  function mostrarproductos(productos) {
+  function mostrarProductos(productos) {
     contenedor.innerHTML = "";
 
     productos.forEach((p) => {
@@ -185,14 +91,14 @@
   buscador.addEventListener("keyup", function() {
     const filtro = buscador.value.toLowerCase();
 
-    const filtrados = listaproductos.filter(p =>
+    const filtrados = listaProductos.filter(p =>
       p.nombre.toLowerCase().includes(filtro)
     );
 
-    mostrarproductos(filtrados);
+    mostrarProductos(filtrados);
   });
 
-  cargarproductos();
+  cargarProductos();
 </script>
 
 </body>
