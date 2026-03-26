@@ -9,7 +9,7 @@ body{
 margin:0;
 font-family:Arial;
 background:linear-gradient(135deg,#000,#f8c8dc);
-color:#fff;
+color:white;
 }
 
 #login{
@@ -18,15 +18,15 @@ margin-top:100px;
 }
 
 input, textarea{
-padding:12px;
-margin:8px;
+padding:10px;
+margin:5px;
 border-radius:10px;
 border:none;
 width:250px;
 }
 
 button{
-padding:12px 20px;
+padding:10px 15px;
 border:none;
 border-radius:20px;
 background:#ff4fa3;
@@ -34,25 +34,15 @@ color:white;
 cursor:pointer;
 }
 
-#panel{
-display:none;
-padding:20px;
-text-align:center;
-}
+#panel{display:none;padding:20px;text-align:center;}
 
 .card{
-background:#fff;
-color:#000;
-padding:10px;
+background:white;
+color:black;
 margin:10px auto;
+padding:10px;
 border-radius:10px;
 max-width:400px;
-}
-
-img{
-width:70px;
-margin:5px;
-border-radius:8px;
 }
 </style>
 </head>
@@ -60,23 +50,29 @@ border-radius:8px;
 <body>
 
 <div id="login">
-<h2>🔐 Acceso Admin</h2>
-<input id="usuario" placeholder="Usuario"><br>
-<input id="password" type="password" placeholder="Contraseña"><br>
+<h2>🔐 Admin</h2>
+<input id="user" placeholder="Usuario"><br>
+<input id="pass" type="password" placeholder="Contraseña"><br>
 <button onclick="login()">Entrar</button>
 </div>
 
 <div id="panel">
-<h2>📦 Panel</h2>
+<h2>Panel de productos</h2>
 
 <input id="nombre" placeholder="Nombre"><br>
 <input id="precio" placeholder="Precio"><br>
 <textarea id="descripcion" placeholder="Descripción"></textarea><br>
 
-<input type="file" id="imagen1"><br>
-<input type="file" id="imagen2"><br>
+<input type="file" id="img1"><br>
+<input type="file" id="img2"><br>
 
-<button onclick="agregar()">Agregar producto</button>
+<label><input type="checkbox" id="nuevo">🔥 Nuevo</label>
+<label><input type="checkbox" id="oferta">Oferta</label>
+<label><input type="checkbox" id="tendencia">Tendencia</label>
+
+<br><br>
+
+<button onclick="agregar()">Agregar</button>
 
 <hr>
 
@@ -103,14 +99,14 @@ const storage=firebase.storage();
 let productos=[];
 
 function login(){
- let u=document.getElementById("usuario").value.toUpperCase();
- let p=document.getElementById("password").value.toUpperCase();
-
- if(u==="ALP-ADMIN" && p==="OSIMIA"){
-  login.style.display="none";
-  panel.style.display="block";
+ if(
+  document.getElementById("user").value==="ALP-ADMIN" &&
+  document.getElementById("pass").value==="OSIMIA"
+ ){
+  document.getElementById("login").style.display="none";
+  document.getElementById("panel").style.display="block";
   cargar();
- }else alert("Error");
+ }else alert("Datos incorrectos");
 }
 
 async function subir(file){
@@ -123,11 +119,16 @@ async function agregar(){
  let nombre=document.getElementById("nombre").value;
  let precio=document.getElementById("precio").value;
  let descripcion=document.getElementById("descripcion").value;
- let f1=document.getElementById("imagen1").files[0];
- let f2=document.getElementById("imagen2").files[0];
 
- if(!nombre||!precio||!descripcion||!f1){
-  alert("Completa todo");
+ let nuevo=document.getElementById("nuevo").checked;
+ let oferta=document.getElementById("oferta").checked;
+ let tendencia=document.getElementById("tendencia").checked;
+
+ let f1=document.getElementById("img1").files[0];
+ let f2=document.getElementById("img2").files[0];
+
+ if(!nombre || !precio || !f1){
+  alert("Falta info");
   return;
  }
 
@@ -139,10 +140,13 @@ async function agregar(){
   precio:Number(precio),
   descripcion,
   imagen:url1,
-  imagen2:url2
+  imagen2:url2,
+  nuevo,
+  oferta,
+  tendencia
  });
 
- alert("Agregado");
+ alert("Guardado");
  cargar();
 }
 
@@ -160,10 +164,6 @@ function mostrar(lista){
   html+=`
   <div class="card">
     <b>${p.nombre}</b> - $${p.precio}<br>
-    ${p.descripcion}<br>
-    <img src="${p.imagen}">
-    ${p.imagen2?`<img src="${p.imagen2}">`:""}
-    <br>
     <button onclick="eliminar('${p.id}')">Eliminar</button>
   </div>`;
  });
