@@ -112,48 +112,12 @@
 </div>
 
 <div class="container" id="productos">
-
-  <div class="card">
-    <img src="https://images.unsplash.com/photo-1581044777550-4cfa60707c03">
-    <div class="info">
-      <div class="nombre">Vestido elegante rosa</div>
-      <div class="precio">$450</div>
-      <div class="nota">Entrega bajo pedido (2-3 días)</div>
-      <a class="boton" href="https://wa.me/525564982986?text=Hola,%20me%20interesa%20el%20vestido%20rosa%20de%20$450">
-        Pedir por WhatsApp
-      </a>
-    </div>
   </div>
 
-  <div class="card">
-    <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f">
-    <div class="info">
-      <div class="nombre">Blusa casual blanca</div>
-      <div class="precio">$320</div>
-      <div class="nota">Entrega bajo pedido (2-3 días)</div>
-      <a class="boton" href="https://wa.me/525564982986?text=Hola,%20me%20interesa%20la%20blusa%20blanca%20de%20$320">
-        Pedir por WhatsApp
-      </a>
-    </div>
-  </div>
-
-  <div class="card">
-    <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b">
-    <div class="info">
-      <div class="nombre">Bolsa moderna negra</div>
-      <div class="precio">$380</div>
-      <div class="nota">Entrega bajo pedido (2-3 días)</div>
-      <a class="boton" href="https://wa.me/525564982986?text=Hola,%20me%20interesa%20la%20bolsa%20negra%20de%20$380">
-        Pedir por WhatsApp
-      </a>
-    </div>
-  </div>
-
-</div>
 
 <script>
   const buscador = document.getElementById("searchInput");
-  const productos = document.querySelectorAll(".card");
+
 
   buscador.addEventListener("keyup", function() {
     const filtro = buscador.value.toLowerCase();
@@ -163,6 +127,72 @@
       producto.style.display = texto.includes(filtro) ? "block" : "none";
     });
   });
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZvW4o8SbyStxX6Sfm4uRmMfN4UAi2pYI",
+    authDomain: "alp-moda.firebaseapp.com",
+    projectId: "alp-moda",
+    storageBucket: "alp-moda.firebasestorage.app",
+    messagingSenderId: "760963874633",
+    appId: "1:760963874633:web:475f91b50a87123627a498"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const contenedor = document.getElementById("productos");
+  const buscador = document.getElementById("searchInput");
+
+  let listaProductos = [];
+
+  async function cargarProductos() {
+    const querySnapshot = await getDocs(collection(db, "productos"));
+
+    listaProductos = [];
+
+    querySnapshot.forEach((doc) => {
+      listaProductos.push(doc.data());
+    });
+
+    mostrarProductos(listaProductos);
+  }
+
+  function mostrarProductos(productos) {
+    contenedor.innerHTML = "";
+
+    productos.forEach((p) => {
+      const card = `
+        <div class="card">
+          <img src="${p.imagen}">
+          <div class="info">
+            <div class="nombre">${p.nombre}</div>
+            <div class="precio">$${p.precio}</div>
+            <div class="nota">Entrega bajo pedido (2-3 días)</div>
+            <a class="boton" href="https://wa.me/525564982986?text=Hola,%20me%20interesa%20${p.nombre}%20de%20$${p.precio}">
+              Pedir por WhatsApp
+            </a>
+          </div>
+        </div>
+      `;
+      contenedor.innerHTML += card;
+    });
+  }
+
+  buscador.addEventListener("keyup", function() {
+    const filtro = buscador.value.toLowerCase();
+
+    const filtrados = listaProductos.filter(p =>
+      p.nombre.toLowerCase().includes(filtro)
+    );
+
+    mostrarProductos(filtrados);
+  });
+
+  cargarProductos();
 </script>
 
 </body>
