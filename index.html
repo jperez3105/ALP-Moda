@@ -1,21 +1,23 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>ALP Moda</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-<header>
-  <h1>ALP Moda</h1>
-  <p>Moda exclusiva • Compra por WhatsApp 💕</p>
-</header>
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZvW4o8SbyStxX6Sfm4uRmMfN4UAi2pYI",
+    authDomain: "alp-moda.firebaseapp.com",
+    projectId: "alp-moda",
+    storageBucket: "alp-moda.firebasestorage.app",
+    messagingSenderId: "760963874633",
+    appId: "1:760963874633:web:475f91b50a87123627a498",
+    measurementId: "G-5GFPD3PNQF"
+  };
 
-<input type="text" id="buscador" placeholder="Buscar producto...">
-
-<div id="productos"></div>
-
-<script src="script.js"></script>
-</body>
-</html>
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
