@@ -1,70 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel ALP Moda</title>
+<meta charset="UTF-8">
+<title>Admin ALP</title>
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div id="login">
-  <h2>Acceso</h2>
-  <input id="usuario" placeholder="Usuario"><br><br>
-  <input id="password" type="password" placeholder="Contraseña"><br><br>
-  <button onclick="login()">Entrar</button>
-</div>
+<h2>Panel Admin</h2>
 
-<div id="panel" style="display:none;">
-  <h2>Panel de productos</h2>
+<input type="text" id="nombre" placeholder="Nombre del producto">
+<input type="number" id="precio" placeholder="Precio">
 
-  <input id="nombre" placeholder="Nombre"><br><br>
-  <input id="precio" placeholder="Precio"><br><br>
-  <input id="imagen" placeholder="URL de imagen"><br><br>
+<textarea id="descripcion" placeholder="Descripción (opcional)"></textarea>
 
-  <button onclick="agregarProducto()">Agregar producto</button>
-</div>
+<p>Imagen 1:</p>
+<input type="file" id="imagen1" accept="image/*">
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<p>Imagen 2 (opcional):</p>
+<input type="file" id="imagen2" accept="image/*">
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBZvW4o8SbyStxX6Sfm4uRmMfN4UAi2pYI",
-  authDomain: "alp-moda.firebaseapp.com",
-  projectId: "alp-moda"
-};
+<select id="etiqueta">
+  <option value="">Sin etiqueta</option>
+  <option value="🔥 Nuevo">🔥 Nuevo</option>
+  <option value="⭐ Popular">⭐ Popular</option>
+</select>
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+<button onclick="agregarProducto()">Agregar producto</button>
 
-// 🔐 LOGIN PERSONALIZADO
-function login() {
-  const user = document.getElementById("usuario").value;
-  const pass = document.getElementById("password").value;
+<h3>Productos actuales</h3>
+<div id="listaAdmin"></div>
 
-  if (user === "ALP-ADMIN" && pass === "OSIMIA") {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("panel").style.display = "block";
-  } else {
-    alert("Datos incorrectos");
-  }
-}
-
-// ➕ AGREGAR PRODUCTO
-function agregarProducto() {
-  const nombre = document.getElementById("nombre").value;
-  const precio = document.getElementById("precio").value;
-  const imagen = document.getElementById("imagen").value;
-
-  db.collection("productos").add({
-    nombre: nombre,
-    precio: Number(precio),
-    imagen: imagen
-  }).then(() => {
-    alert("Producto agregado");
-  });
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
