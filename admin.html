@@ -7,13 +7,22 @@
 
 <body>
 
-<h2>Panel de productos</h2>
+<div id="login">
+  <h2>Acceso</h2>
+  <input id="usuario" placeholder="Usuario"><br><br>
+  <input id="password" type="password" placeholder="Contraseña"><br><br>
+  <button onclick="login()">Entrar</button>
+</div>
 
-<input id="nombre" placeholder="Nombre"><br><br>
-<input id="precio" placeholder="Precio"><br><br>
-<input id="imagen" placeholder="URL de imagen"><br><br>
+<div id="panel" style="display:none;">
+  <h2>Panel de productos</h2>
 
-<button onclick="agregarProducto()">Agregar producto</button>
+  <input id="nombre" placeholder="Nombre"><br><br>
+  <input id="precio" placeholder="Precio"><br><br>
+  <input id="imagen" placeholder="URL de imagen"><br><br>
+
+  <button onclick="agregarProducto()">Agregar producto</button>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -27,6 +36,18 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+function login() {
+  const user = document.getElementById("usuario").value;
+  const pass = document.getElementById("password").value;
+
+  if (user === "admin" && pass === "1234") {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("panel").style.display = "block";
+  } else {
+    alert("Datos incorrectos");
+  }
+}
 
 function agregarProducto() {
   const nombre = document.getElementById("nombre").value;
