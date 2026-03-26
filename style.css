@@ -1,100 +1,166 @@
-body {
-  font-family: Arial;
-  margin: 0;
-  background: #f5f5f5;
-}
+// 🔐 LOGIN ADMIN
+if (window.location.pathname.includes("admin.html")) {
+  let usuario = prompt("Usuario:");
+  let contraseña = prompt("Contraseña:");
 
-/* HEADER */
-header {
-  background: linear-gradient(90deg, #000, #e8aeb7);
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
-
-/* BUSCADOR */
-#buscador {
-  display: block;
-  margin: 20px auto;
-  padding: 12px;
-  width: 80%;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-}
-
-/* GRID PRODUCTOS */
-#productos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-  padding: 20px;
-}
-
-/* TARJETAS */
-.card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-}
-
-.card:hover {
-  transform: scale(1.03);
-}
-
-.card img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-/* INFO PRODUCTO */
-.info {
-  padding: 12px;
-}
-
-/* BOTONES */
-button {
-  width: 90%;
-  margin: 10px auto;
-  display: block;
-  padding: 12px;
-  background: linear-gradient(90deg, #e8aeb7, #d48b97);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* ETIQUETAS */
-.etiqueta {
-  color: red;
-  font-weight: bold;
-}
-
-/* FORMULARIOS ADMIN */
-input, textarea, select {
-  display: block;
-  width: 90%;
-  margin: 10px auto;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-textarea {
-  height: 80px;
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-  #buscador {
-    width: 95%;
-  }
-
-  .card img {
-    height: 180px;
+  if (usuario !== "ALP-ADMIN" || contraseña !== "OSIMIA") {
+    alert("Acceso denegado");
+    window.location.href = "index.html";
   }
 }
+
+let productos = JSON.parse(localStorage.getItem("productos")) || [];
+
+// GUARDAR
+function guardar() {
+  localStorage.setItem("productos", JSON.stringify(productos));
+}
+
+// MOSTRAR TIENDA
+function mostrarProductos() {
+  let contenedor = document.getElementById("productos");
+  if (!contenedor) return;
+
+  contenedor.innerHTML = "";
+
+  productos.forEach((p, index) => {
+    let card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="${p.imagen1}">
+      ${p.imagen2 ? `<img src="${p.imagen2}">` : ""}
+      <div class="info">
+        <h3>${p.nombre}</h3>
+        ${p.etiqueta ? `<p class="etiqueta">${p.etiqueta}</p>` : ""}
+        <p>$${p.precio}</p>
+        ${p.descripcion ? `<p>${p.descripcion}</p>` : ""}
+        <button onclick="comprar('${p.nombre}', ${p.precio})">
+          Pedir por WhatsApp
+        </button>
+      </div>
+    `;
+
+    contenedor.appendChild(card);
+  });
+}
+
+// WHATSAPP
+function comprar(nombre, precio) {
+  let mensaje = `Hola, me interesa ${nombre} de $${precio}`;
+  let url = `https://wa.me/5215564982086?text=${encodeURIComponent(mensaje)}`;
+  window.open(url);
+}
+
+// AGREGAR PRODUCTO
+function agregarProducto() {
+  let nombre = document.getElementById("nombre").value;
+  let precio = document.getElementById("precio").value;
+  let descripcion = document.getElementById("descripcion").value;
+  let etiqueta = document.getElementById("etiqueta").value;
+
+  let img1 = document.getElementById("imagen1").files[0];
+  let img2 = document.getElementById("imagen2").files[0];
+
+  if (!img1) {
+    alert("Debes subir al menos una imagen");
+    return;
+  }
+
+  let reader1 = new FileReader();
+  let reader2 = new FileReader();
+
+  reader1.onload = function(e1) {
+    if (img2) {
+      reader2.onload = function(e2) {
+        guardarProducto(e1.target.result, e2.target.result);
+      };
+      reader2.readAsDataURL(img2);
+    } else {
+      guardarProducto(e1.target.result, "");
+    }
+  };
+
+  reader1.readAsDataURL(img1);
+
+  function guardarProducto(imagen1, imagen2) {
+    let producto = {
+      nombre,
+      precio,
+      descripcion,
+      etiqueta,
+      imagen1,
+      imagen2
+    };
+
+    productos.push(producto);
+    guardar();
+    mostrarAdmin();
+    alert("Producto agregado");
+  }
+}
+
+// MOSTRAR ADMIN
+function mostrarAdmin() {
+  let lista = document.getElementById("listaAdmin");
+  if (!lista) return;
+
+  lista.innerHTML = "";
+
+  productos.forEach((p, index) => {
+    let div = document.createElement("div");
+
+    div.innerHTML = `
+      <p>${p.nombre} - $${p.precio}</p>
+      <button onclick="eliminar(${index})">Eliminar</button>
+      <hr>
+    `;
+
+    lista.appendChild(div);
+  });
+}
+
+// ELIMINAR
+function eliminar(index) {
+  productos.splice(index, 1);
+  guardar();
+  mostrarAdmin();
+}
+
+// BUSCADOR
+let buscador = document.getElementById("buscador");
+if (buscador) {
+  buscador.addEventListener("input", function() {
+    let texto = buscador.value.toLowerCase();
+
+    let filtrados = productos.filter(p =>
+      p.nombre.toLowerCase().includes(texto)
+    );
+
+    let contenedor = document.getElementById("productos");
+    contenedor.innerHTML = "";
+
+    filtrados.forEach(p => {
+      let card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <img src="${p.imagen1}">
+        ${p.imagen2 ? `<img src="${p.imagen2}">` : ""}
+        <div class="info">
+          <h3>${p.nombre}</h3>
+          <p>$${p.precio}</p>
+          <button onclick="comprar('${p.nombre}', ${p.precio})">
+            Pedir por WhatsApp
+          </button>
+        </div>
+      `;
+
+      contenedor.appendChild(card);
+    });
+  });
+}
+
+// INICIAR
+mostrarProductos();
+mostrarAdmin();
