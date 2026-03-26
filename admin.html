@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel ALP Moda</title>
+</head>
+
+<body>
+
+<h2>Panel de productos</h2>
+
+<input id="nombre" placeholder="Nombre"><br><br>
+<input id="precio" placeholder="Precio"><br><br>
+<input id="imagen" placeholder="URL de imagen"><br><br>
+
+<button onclick="agregarProducto()">Agregar producto</button>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBZvW4o8SbyStxX6Sfm4uRmMfN4UAi2pYI",
+  authDomain: "alp-moda.firebaseapp.com",
+  projectId: "alp-moda"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function agregarProducto() {
+  const nombre = document.getElementById("nombre").value;
+  const precio = document.getElementById("precio").value;
+  const imagen = document.getElementById("imagen").value;
+
+  db.collection("productos").add({
+    nombre: nombre,
+    precio: Number(precio),
+    imagen: imagen
+  }).then(() => {
+    alert("Producto agregado");
+  });
+}
+</script>
+
+</body>
+</html>
