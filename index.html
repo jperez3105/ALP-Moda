@@ -3,30 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <title>ALP Moda</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{margin:0;font-family:Arial;background:#f5f5f5;}
-header{text-align:center;background:#000;color:#fff;padding:20px;}
-.container{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;padding:15px;}
-.card{background:#fff;border-radius:10px;overflow:hidden;}
-.card img{width:100%;height:220px;object-fit:cover;}
+body{margin:0;font-family:Arial;background:#f7f7f7;}
+
+/* HEADER */
+header{
+position:relative;
+height:260px;
+overflow:hidden;
+}
+
+header img{
+width:100%;
+height:100%;
+object-fit:cover;
+filter:brightness(60%);
+}
+
+header .texto{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+text-align:center;
+color:white;
+}
+
+header h1{margin:0;font-size:30px;}
+header p{margin:5px 0;}
+
+/* BUSCADOR */
+.buscador{
+text-align:center;
+padding:15px;
+}
+
+input{
+padding:12px;
+border-radius:25px;
+width:80%;
+max-width:400px;
+border:1px solid #ccc;
+}
+
+/* GRID */
+.container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:15px;
+padding:15px;
+}
+
+/* CARD */
+.card{
+background:white;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+transition:0.3s;
+}
+
+.card:hover{transform:scale(1.03);}
+
+.card img{
+width:100%;
+height:200px;
+object-fit:cover;
+}
+
+/* INFO */
+.info{padding:10px;}
+.precio{font-weight:bold;}
+.desc{font-size:13px;color:gray;}
+
+.tag{
+font-size:11px;
+padding:3px 6px;
+border-radius:5px;
+color:white;
+margin-right:5px;
+}
+
+.nuevo{background:#ff4fa3;}
+.oferta{background:#ff0000;}
+.tendencia{background:#ff9800;}
+
+/* BOTON */
+.boton{
+display:block;
+margin-top:10px;
+padding:8px;
+text-align:center;
+background:#f8c8dc;
+border-radius:5px;
+text-decoration:none;
+color:black;
+}
+
+/* WHATS */
+.whatsapp{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:white;
+padding:15px;
+border-radius:50%;
+font-size:20px;
+text-decoration:none;
+}
+
+/* CARRUSEL */
+.carousel{
+display:flex;
+overflow-x:auto;
+gap:10px;
+padding:10px;
+}
+
+.carousel img{
+height:120px;
+border-radius:10px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
+<img src="https://images.unsplash.com/photo-1521335629791-ce4aec67dd47">
+<div class="texto">
 <h1>ALP Moda</h1>
 <p>Moda para mujer y caballero</p>
+</div>
 </header>
 
+<div class="buscador">
+<input id="buscar" placeholder="Buscar producto...">
+</div>
+
 <div id="productos" class="container"></div>
+
+<a class="whatsapp" href="https://wa.me/525564982086">💬</a>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
-
 firebase.initializeApp({
  apiKey:"AIzaSyBZvW4o8SbyStxX6Sfm4uRmMfN4UAi2pYI",
  authDomain:"alp-moda.firebaseapp.com",
@@ -34,24 +159,62 @@ firebase.initializeApp({
 });
 
 const db=firebase.firestore();
-const contenedor=document.getElementById("productos");
+let lista=[];
 
-db.collection("productos").get().then(res=>{
- res.forEach(doc=>{
-  let p=doc.data();
+function cargar(){
+ db.collection("productos").get().then(res=>{
+  lista=[];
+  res.forEach(doc=>lista.push(doc.data()));
+  render(lista);
+ });
+}
 
-  contenedor.innerHTML+=`
+function render(data){
+ let html="";
+ data.forEach(p=>{
+  if(!p.nombre || !p.precio || !p.imagen) return;
+
+  html+=`
   <div class="card">
     <img src="${p.imagen}">
-    <div style="padding:10px">
-      <b>${p.nombre}</b><br>
-      $${p.precio}<br>
-      ${p.descripcion}
+
+    ${p.imagen2 ? `
+    <div class="carousel">
+      <img src="${p.imagen}">
+      <img src="${p.imagen2}">
+    </div>`:""}
+
+    <div class="info">
+
+      <div>
+        ${p.nuevo?'<span class="tag nuevo">🔥 Nuevo</span>':""}
+        ${p.oferta?'<span class="tag oferta">Oferta</span>':""}
+        ${p.tendencia?'<span class="tag tendencia">Tendencia</span>':""}
+      </div>
+
+      <div><b>${p.nombre}</b></div>
+      <div class="precio">$${p.precio}</div>
+      <div class="desc">${p.descripcion||""}</div>
+
+      <a class="boton" 
+      href="https://wa.me/525564982086?text=Hola Liz me interesa ${p.nombre}">
+      Comprar por WhatsApp
+      </a>
+
     </div>
   </div>`;
  });
+
+ document.getElementById("productos").innerHTML=html;
+}
+
+document.getElementById("buscar").addEventListener("keyup",function(){
+ let f=this.value.toLowerCase();
+ let filtrados=lista.filter(p=>p.nombre.toLowerCase().includes(f));
+ render(filtrados);
 });
 
+cargar();
 </script>
 
 </body>
