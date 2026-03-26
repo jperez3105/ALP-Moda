@@ -37,11 +37,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// 🔐 LOGIN PERSONALIZADO
 function login() {
   const user = document.getElementById("usuario").value;
   const pass = document.getElementById("password").value;
 
-  if (user === "admin" && pass === "1234") {
+  if (user === "ALP-ADMIN" && pass === "OSIMIA") {
     document.getElementById("login").style.display = "none";
     document.getElementById("panel").style.display = "block";
   } else {
@@ -49,6 +50,7 @@ function login() {
   }
 }
 
+// ➕ AGREGAR PRODUCTO
 function agregarProducto() {
   const nombre = document.getElementById("nombre").value;
   const precio = document.getElementById("precio").value;
