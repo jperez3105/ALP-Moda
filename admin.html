@@ -2,53 +2,69 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Admin ALP</title>
-<link rel="stylesheet" href="style.css">
+<title>Admin</title>
 </head>
+
 <body>
 
-<h2>Panel Admin</h2>
+<div id="login">
+<h2>Acceso</h2>
+<input id="usuario" placeholder="Usuario"><br><br>
+<input id="password" type="password" placeholder="Contraseña"><br><br>
+<button onclick="login()">Entrar</button>
+</div>
 
-<input type="text" id="nombre" placeholder="Nombre del producto">
-<input type="number" id="precio" placeholder="Precio">
+<div id="panel" style="display:none;">
+<h2>Panel</h2>
 
-<textarea id="descripcion" placeholder="Descripción (opcional)"></textarea>
+<input id="nombre" placeholder="Nombre"><br><br>
+<input id="precio" placeholder="Precio"><br><br>
+<input id="imagen" placeholder="URL imagen"><br><br>
 
-<p>Imagen 1:</p>
-<input type="file" id="imagen1" accept="image/*">
+<button onclick="agregar()">Agregar</button>
+</div>
 
-<p>Imagen 2 (opcional):</p>
-<input type="file" id="imagen2" accept="image/*">
-
-<select id="etiqueta">
-  <option value="">Sin etiqueta</option>
-  <option value="🔥 Nuevo">🔥 Nuevo</option>
-  <option value="💖 Tendencia">💖 Tendencia</option>
-</select>
-
-<button onclick="agregarProducto()">Agregar producto</button>
-
-<h3>Productos actuales</h3>
-<div id="listaAdmin"></div>
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBZvW4o8SbyStxX6Sfm4uRmMfN4UAi2pYI",
-  authDomain: "alp-moda.firebaseapp.com",
-  projectId: "alp-moda",
-  storageBucket: "alp-moda.firebasestorage.app",
-  messagingSenderId: "760963874633",
-  appId: "1:760963874633:web:475f91b50a87123627a498"
-};
+firebase.initializeApp({
+ apiKey:"AIzaSyBZvW4o8SbyStxX6Sfm4uRmMfN4UAi2pYI",
+ authDomain:"alp-moda.firebaseapp.com",
+ projectId:"alp-moda"
+});
 
-firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function login(){
+ let u = document.getElementById("usuario").value.trim().toUpperCase();
+ let p = document.getElementById("password").value.trim().toUpperCase();
+
+ if(u==="ALP-ADMIN" && p==="OSIMIA"){
+  login.style.display="none";
+  panel.style.display="block";
+ } else alert("Error");
+}
+
+function agregar(){
+ let nombre = document.getElementById("nombre").value;
+ let precio = document.getElementById("precio").value;
+ let imagen = document.getElementById("imagen").value;
+
+ if(!nombre || !precio || !imagen){
+  alert("Completa todo");
+  return;
+ }
+
+ db.collection("productos").add({
+  nombre,
+  precio:Number(precio),
+  imagen
+ });
+
+ alert("Agregado");
+}
 </script>
-
-<script src="script.js"></script>
 
 </body>
 </html>
