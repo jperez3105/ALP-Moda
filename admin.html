@@ -14,11 +14,13 @@ padding:20px;
 
 h2{text-align:center;}
 
-input{
+input, textarea{
 padding:10px;
 margin:5px;
 border-radius:8px;
 border:none;
+width:90%;
+max-width:400px;
 }
 
 button{
@@ -50,51 +52,66 @@ border-radius:8px;
 
 <h2>📦 Panel de productos</h2>
 
-<input id="nombre" placeholder="Nombre">
+<input id="nombre" placeholder="Nombre"><br>
 <input id="precio" placeholder="Precio"><br>
 
-<input id="imagen1" placeholder="URL Imagen 1">
-<input id="imagen2" placeholder="URL Imagen 2 (opcional)"><br>
+<textarea id="descripcion" placeholder="Descripción"></textarea><br>
+
+<input type="file" id="imagen1"><br>
+<input type="file" id="imagen2"><br>
 
 <button onclick="agregar()">Agregar producto</button>
 
 <hr>
 
-<h3>🔍 Buscar producto</h3>
-<input id="buscar" placeholder="Buscar...">
+<input id="buscar" placeholder="Buscar producto...">
 
 <div id="lista"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 
 <script>
 firebase.initializeApp({
  apiKey:"AIzaSyBZvW4o8SbyStxX6Sfm4uRmMfN4UAi2pYI",
  authDomain:"alp-moda.firebaseapp.com",
- projectId:"alp-moda"
+ projectId:"alp-moda",
+ storageBucket:"alp-moda.appspot.com"
 });
 
 const db = firebase.firestore();
+const storage = firebase.storage();
 
 let productos = [];
 
-function agregar(){
+async function subirImagen(file){
+ const ref = storage.ref("productos/" + Date.now() + "_" + file.name);
+ await ref.put(file);
+ return await ref.getDownloadURL();
+}
+
+async function agregar(){
  let nombre = document.getElementById("nombre").value;
  let precio = document.getElementById("precio").value;
- let imagen1 = document.getElementById("imagen1").value;
- let imagen2 = document.getElementById("imagen2").value;
+ let descripcion = document.getElementById("descripcion").value;
+ let file1 = document.getElementById("imagen1").files[0];
+ let file2 = document.getElementById("imagen2").files[0];
 
- if(!nombre || !precio || !imagen1){
-  alert("Completa los campos obligatorios");
+ if(!nombre || !precio || !descripcion || !file1){
+  alert("Completa todo");
   return;
  }
 
- db.collection("productos").add({
+ let url1 = await subirImagen(file1);
+ let url2 = file2 ? await subirImagen(file2) : "";
+
+ await db.collection("productos").add({
   nombre,
   precio:Number(precio),
-  imagen:imagen1,
-  imagen2:imagen2 || ""
+  descripcion,
+  imagen:url1,
+  imagen2:url2
  });
 
  alert("Producto agregado");
@@ -117,6 +134,7 @@ function mostrar(lista){
   html+=`
   <div class="card">
     <b>${p.nombre}</b> - $${p.precio}<br>
+    <small>${p.descripcion}</small><br>
     <img src="${p.imagen}">
     ${p.imagen2 ? `<img src="${p.imagen2}">` : ""}
     <br>
@@ -130,7 +148,6 @@ function mostrar(lista){
 
 function eliminar(id){
  db.collection("productos").doc(id).delete();
- alert("Eliminado");
  cargar();
 }
 
@@ -141,8 +158,6 @@ function editar(id){
  db.collection("productos").doc(id).update({
   precio:Number(nuevo)
  });
-
- alert("Actualizado");
  cargar();
 }
 
