@@ -5,57 +5,65 @@
 <title>Admin ALP Moda</title>
 
 <style>
-body {
-  font-family: Arial;
-  background: linear-gradient(135deg,#000,#f8c8dc);
-  color:#fff;
-  text-align:center;
-  padding:20px;
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#000,#f8c8dc);
+color:#fff;
+padding:20px;
 }
 
-input {
-  width:90%;
-  max-width:400px;
-  padding:12px;
-  margin:10px;
-  border:none;
-  border-radius:8px;
+h2{text-align:center;}
+
+input{
+padding:10px;
+margin:5px;
+border-radius:8px;
+border:none;
 }
 
-button {
-  background:#ff4fa3;
-  color:#fff;
-  padding:12px 20px;
-  border:none;
-  border-radius:20px;
-  cursor:pointer;
-  font-weight:bold;
+button{
+padding:10px;
+border:none;
+border-radius:10px;
+background:#ff4fa3;
+color:white;
+cursor:pointer;
+margin:5px;
 }
 
-#panel {
-  display:none;
+.card{
+background:#fff;
+color:#000;
+padding:10px;
+margin:10px 0;
+border-radius:10px;
+}
+
+img{
+width:80px;
+border-radius:8px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="login">
-<h2>🔐 Acceso Admin</h2>
-<input id="usuario" placeholder="Usuario"><br>
-<input id="password" type="password" placeholder="Contraseña"><br>
-<button onclick="login()">Entrar</button>
-</div>
-
-<div id="panel">
 <h2>📦 Panel de productos</h2>
 
-<input id="nombre" placeholder="Nombre del producto">
-<input id="precio" placeholder="Precio">
-<input id="imagen" placeholder="URL imagen">
+<input id="nombre" placeholder="Nombre">
+<input id="precio" placeholder="Precio"><br>
+
+<input id="imagen1" placeholder="URL Imagen 1">
+<input id="imagen2" placeholder="URL Imagen 2 (opcional)"><br>
 
 <button onclick="agregar()">Agregar producto</button>
-</div>
+
+<hr>
+
+<h3>🔍 Buscar producto</h3>
+<input id="buscar" placeholder="Buscar...">
+
+<div id="lista"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -69,36 +77,82 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 
-function login(){
- let u = document.getElementById("usuario").value.trim().toUpperCase();
- let p = document.getElementById("password").value.trim().toUpperCase();
-
- if(u==="ALP-ADMIN" && p==="OSIMIA"){
-  document.getElementById("login").style.display="none";
-  document.getElementById("panel").style.display="block";
- } else {
-  alert("Datos incorrectos");
- }
-}
+let productos = [];
 
 function agregar(){
  let nombre = document.getElementById("nombre").value;
  let precio = document.getElementById("precio").value;
- let imagen = document.getElementById("imagen").value;
+ let imagen1 = document.getElementById("imagen1").value;
+ let imagen2 = document.getElementById("imagen2").value;
 
- if(!nombre || !precio || !imagen){
-  alert("Completa todos los campos");
+ if(!nombre || !precio || !imagen1){
+  alert("Completa los campos obligatorios");
   return;
  }
 
  db.collection("productos").add({
   nombre,
   precio:Number(precio),
-  imagen
+  imagen:imagen1,
+  imagen2:imagen2 || ""
  });
 
  alert("Producto agregado");
+ cargar();
 }
+
+function cargar(){
+ db.collection("productos").get().then(res=>{
+  productos=[];
+  res.forEach(doc=>{
+    productos.push({...doc.data(), id:doc.id});
+  });
+  mostrar(productos);
+ });
+}
+
+function mostrar(lista){
+ let html="";
+ lista.forEach(p=>{
+  html+=`
+  <div class="card">
+    <b>${p.nombre}</b> - $${p.precio}<br>
+    <img src="${p.imagen}">
+    ${p.imagen2 ? `<img src="${p.imagen2}">` : ""}
+    <br>
+    <button onclick="eliminar('${p.id}')">Eliminar</button>
+    <button onclick="editar('${p.id}')">Editar precio</button>
+  </div>
+  `;
+ });
+ document.getElementById("lista").innerHTML=html;
+}
+
+function eliminar(id){
+ db.collection("productos").doc(id).delete();
+ alert("Eliminado");
+ cargar();
+}
+
+function editar(id){
+ let nuevo = prompt("Nuevo precio:");
+ if(!nuevo) return;
+
+ db.collection("productos").doc(id).update({
+  precio:Number(nuevo)
+ });
+
+ alert("Actualizado");
+ cargar();
+}
+
+document.getElementById("buscar").addEventListener("keyup",function(){
+ let f = this.value.toLowerCase();
+ let filtrados = productos.filter(p=>p.nombre.toLowerCase().includes(f));
+ mostrar(filtrados);
+});
+
+cargar();
 </script>
 
 </body>
