@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
-  background: #fff;
+  background: linear-gradient(180deg, #fff, #ffe6f0);
 }
 
 /* HEADER */
@@ -9,17 +11,27 @@ header {
   background: linear-gradient(90deg, #000, #ff4da6);
   color: white;
   text-align: center;
-  padding: 25px;
+  padding: 30px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+header p {
+  font-size: 14px;
 }
 
 /* BUSCADOR */
 #buscador {
   display: block;
   margin: 20px auto;
-  padding: 12px;
+  padding: 14px;
   width: 85%;
-  border-radius: 25px;
-  border: 1px solid #ddd;
+  border-radius: 30px;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 /* GRID */
@@ -33,9 +45,14 @@ header {
 /* CARD */
 .card {
   background: white;
-  border-radius: 15px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
 }
 
 /* IMAGEN */
@@ -51,8 +68,9 @@ header {
 }
 
 .precio {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
+  color: #ff4da6;
 }
 
 /* BOTONES */
@@ -61,32 +79,20 @@ button {
   margin: 8px auto;
   display: block;
   padding: 12px;
-  background: #ff4da6;
+  background: linear-gradient(90deg, #ff4da6, #ff80bf);
   color: white;
   border: none;
-  border-radius: 25px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* ETIQUETA */
-.etiqueta {
-  color: #ff4da6;
+  border-radius: 30px;
   font-weight: bold;
 }
 
-/* ADMIN */
+/* FORM ADMIN */
 input, textarea, select {
   display: block;
   width: 90%;
   margin: 10px auto;
   padding: 12px;
   border-radius: 10px;
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-  .card img {
-    height: 200px;
-  }
+  border: none;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
