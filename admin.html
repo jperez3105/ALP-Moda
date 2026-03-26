@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Admin</title>
+<title>Admin ALP Moda</title>
 </head>
 
 <body>
@@ -15,13 +15,13 @@
 </div>
 
 <div id="panel" style="display:none;">
-<h2>Panel</h2>
+<h2>Panel de productos</h2>
 
 <input id="nombre" placeholder="Nombre"><br><br>
 <input id="precio" placeholder="Precio"><br><br>
 <input id="imagen" placeholder="URL imagen"><br><br>
 
-<button onclick="agregar()">Agregar</button>
+<button onclick="agregar()">Agregar producto</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -41,9 +41,11 @@ function login(){
  let p = document.getElementById("password").value.trim().toUpperCase();
 
  if(u==="ALP-ADMIN" && p==="OSIMIA"){
-  login.style.display="none";
-  panel.style.display="block";
- } else alert("Error");
+  document.getElementById("login").style.display="none";
+  document.getElementById("panel").style.display="block";
+ } else {
+  alert("Datos incorrectos");
+ }
 }
 
 function agregar(){
@@ -52,17 +54,17 @@ function agregar(){
  let imagen = document.getElementById("imagen").value;
 
  if(!nombre || !precio || !imagen){
-  alert("Completa todo");
+  alert("Completa todos los campos");
   return;
  }
 
  db.collection("productos").add({
-  nombre,
-  precio:Number(precio),
-  imagen
+  nombre: nombre,
+  precio: Number(precio),
+  imagen: imagen
  });
 
- alert("Agregado");
+ alert("Producto agregado correctamente");
 }
 </script>
 
