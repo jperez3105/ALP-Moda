@@ -1,11 +1,21 @@
+// 🔐 LOGIN ADMIN (FORZADO)
+if (window.location.href.includes("admin.html")) {
+  let usuario = prompt("Usuario:");
+  let contraseña = prompt("Contraseña:");
+
+  if (usuario !== "ALP-ADMIN" || contraseña !== "OSIMIA") {
+    alert("Acceso denegado");
+    window.location.href = "index.html";
+  }
+}
+
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 
-// GUARDAR
 function guardar() {
   localStorage.setItem("productos", JSON.stringify(productos));
 }
 
-// MOSTRAR TIENDA
+// 👉 MOSTRAR PRODUCTOS (CON SLIDER)
 function mostrarProductos() {
   let contenedor = document.getElementById("productos");
   if (!contenedor) return;
@@ -13,18 +23,27 @@ function mostrarProductos() {
   contenedor.innerHTML = "";
 
   productos.forEach((p, index) => {
+
     let card = document.createElement("div");
     card.className = "card";
 
+    let imagenActual = p.imagen1;
+
     card.innerHTML = `
-      <img src="${p.imagen1}">
+      <div class="slider">
+        <img src="${p.imagen1}" id="img-${index}">
+      </div>
+
       <div class="info">
         <h3>${p.nombre}</h3>
-        ${p.etiqueta ? `<p class="etiqueta">${p.etiqueta}</p>` : ""}
-        <p>$${p.precio}</p>
-        ${p.descripcion ? `<p>${p.descripcion}</p>` : ""}
+        ${p.etiqueta ? `<span class="etiqueta">${p.etiqueta}</span>` : ""}
+        <p class="precio">$${p.precio}</p>
+        ${p.descripcion ? `<p class="desc">${p.descripcion}</p>` : ""}
+
+        <button onclick="cambiarImagen(${index})">Ver otra foto</button>
+
         <button onclick="comprar('${p.nombre}', ${p.precio})">
-          Pedir por WhatsApp
+          Comprar por WhatsApp 💬
         </button>
       </div>
     `;
@@ -33,14 +52,24 @@ function mostrarProductos() {
   });
 }
 
-// WHATSAPP (YA CON TU NÚMERO)
+// 👉 CAMBIAR IMAGEN
+function cambiarImagen(index) {
+  let img = document.getElementById(`img-${index}`);
+  let p = productos[index];
+
+  if (!p.imagen2) return;
+
+  img.src = img.src === p.imagen1 ? p.imagen2 : p.imagen1;
+}
+
+// 👉 WHATSAPP
 function comprar(nombre, precio) {
   let mensaje = `Hola, me interesa ${nombre} de $${precio}`;
   let url = `https://wa.me/5215564982086?text=${encodeURIComponent(mensaje)}`;
   window.open(url);
 }
 
-// AGREGAR PRODUCTO (CON 2 IMÁGENES)
+// 👉 AGREGAR PRODUCTO
 function agregarProducto() {
   let nombre = document.getElementById("nombre").value;
   let precio = document.getElementById("precio").value;
@@ -51,7 +80,7 @@ function agregarProducto() {
   let img2 = document.getElementById("imagen2").files[0];
 
   if (!img1) {
-    alert("Debes subir al menos una imagen");
+    alert("Sube al menos una imagen");
     return;
   }
 
@@ -72,23 +101,22 @@ function agregarProducto() {
   reader1.readAsDataURL(img1);
 
   function guardarProducto(imagen1, imagen2) {
-    let producto = {
+    productos.push({
       nombre,
       precio,
       descripcion,
       etiqueta,
       imagen1,
       imagen2
-    };
+    });
 
-    productos.push(producto);
     guardar();
     mostrarAdmin();
     alert("Producto agregado");
   }
 }
 
-// MOSTRAR ADMIN
+// 👉 ADMIN LISTA
 function mostrarAdmin() {
   let lista = document.getElementById("listaAdmin");
   if (!lista) return;
@@ -99,7 +127,7 @@ function mostrarAdmin() {
     let div = document.createElement("div");
 
     div.innerHTML = `
-      <p>${p.nombre} - $${p.precio}</p>
+      <p><strong>${p.nombre}</strong> - $${p.precio}</p>
       <button onclick="eliminar(${index})">Eliminar</button>
       <hr>
     `;
@@ -108,14 +136,14 @@ function mostrarAdmin() {
   });
 }
 
-// ELIMINAR
+// 👉 ELIMINAR
 function eliminar(index) {
   productos.splice(index, 1);
   guardar();
   mostrarAdmin();
 }
 
-// BUSCADOR
+// 👉 BUSCADOR
 let buscador = document.getElementById("buscador");
 if (buscador) {
   buscador.addEventListener("input", function() {
@@ -128,7 +156,7 @@ if (buscador) {
     let contenedor = document.getElementById("productos");
     contenedor.innerHTML = "";
 
-    filtrados.forEach(p => {
+    filtrados.forEach((p, index) => {
       let card = document.createElement("div");
       card.className = "card";
 
@@ -138,7 +166,7 @@ if (buscador) {
           <h3>${p.nombre}</h3>
           <p>$${p.precio}</p>
           <button onclick="comprar('${p.nombre}', ${p.precio})">
-            Pedir por WhatsApp
+            Comprar
           </button>
         </div>
       `;
@@ -148,6 +176,5 @@ if (buscador) {
   });
 }
 
-// INICIAR
 mostrarProductos();
 mostrarAdmin();
