@@ -6,43 +6,52 @@
 
 <style>
 body{
+margin:0;
 font-family:Arial;
 background:linear-gradient(135deg,#000,#f8c8dc);
 color:#fff;
-padding:20px;
 }
 
-h2{text-align:center;}
+#login{
+text-align:center;
+margin-top:100px;
+}
 
 input, textarea{
-padding:10px;
-margin:5px;
-border-radius:8px;
+padding:12px;
+margin:8px;
+border-radius:10px;
 border:none;
-width:90%;
-max-width:400px;
+width:250px;
 }
 
 button{
-padding:10px;
+padding:12px 20px;
 border:none;
-border-radius:10px;
+border-radius:20px;
 background:#ff4fa3;
 color:white;
 cursor:pointer;
-margin:5px;
+}
+
+#panel{
+display:none;
+padding:20px;
+text-align:center;
 }
 
 .card{
 background:#fff;
 color:#000;
 padding:10px;
-margin:10px 0;
+margin:10px auto;
 border-radius:10px;
+max-width:400px;
 }
 
 img{
-width:80px;
+width:70px;
+margin:5px;
 border-radius:8px;
 }
 </style>
@@ -50,11 +59,18 @@ border-radius:8px;
 
 <body>
 
-<h2>📦 Panel de productos</h2>
+<div id="login">
+<h2>🔐 Acceso Admin</h2>
+<input id="usuario" placeholder="Usuario"><br>
+<input id="password" type="password" placeholder="Contraseña"><br>
+<button onclick="login()">Entrar</button>
+</div>
+
+<div id="panel">
+<h2>📦 Panel</h2>
 
 <input id="nombre" placeholder="Nombre"><br>
 <input id="precio" placeholder="Precio"><br>
-
 <textarea id="descripcion" placeholder="Descripción"></textarea><br>
 
 <input type="file" id="imagen1"><br>
@@ -64,9 +80,10 @@ border-radius:8px;
 
 <hr>
 
-<input id="buscar" placeholder="Buscar producto...">
+<input id="buscar" placeholder="Buscar...">
 
 <div id="lista"></div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -80,31 +97,42 @@ firebase.initializeApp({
  storageBucket:"alp-moda.appspot.com"
 });
 
-const db = firebase.firestore();
-const storage = firebase.storage();
+const db=firebase.firestore();
+const storage=firebase.storage();
 
-let productos = [];
+let productos=[];
 
-async function subirImagen(file){
- const ref = storage.ref("productos/" + Date.now() + "_" + file.name);
+function login(){
+ let u=document.getElementById("usuario").value.toUpperCase();
+ let p=document.getElementById("password").value.toUpperCase();
+
+ if(u==="ALP-ADMIN" && p==="OSIMIA"){
+  login.style.display="none";
+  panel.style.display="block";
+  cargar();
+ }else alert("Error");
+}
+
+async function subir(file){
+ const ref=storage.ref("productos/"+Date.now()+file.name);
  await ref.put(file);
  return await ref.getDownloadURL();
 }
 
 async function agregar(){
- let nombre = document.getElementById("nombre").value;
- let precio = document.getElementById("precio").value;
- let descripcion = document.getElementById("descripcion").value;
- let file1 = document.getElementById("imagen1").files[0];
- let file2 = document.getElementById("imagen2").files[0];
+ let nombre=document.getElementById("nombre").value;
+ let precio=document.getElementById("precio").value;
+ let descripcion=document.getElementById("descripcion").value;
+ let f1=document.getElementById("imagen1").files[0];
+ let f2=document.getElementById("imagen2").files[0];
 
- if(!nombre || !precio || !descripcion || !file1){
+ if(!nombre||!precio||!descripcion||!f1){
   alert("Completa todo");
   return;
  }
 
- let url1 = await subirImagen(file1);
- let url2 = file2 ? await subirImagen(file2) : "";
+ let url1=await subir(f1);
+ let url2=f2?await subir(f2):"";
 
  await db.collection("productos").add({
   nombre,
@@ -114,16 +142,14 @@ async function agregar(){
   imagen2:url2
  });
 
- alert("Producto agregado");
+ alert("Agregado");
  cargar();
 }
 
 function cargar(){
  db.collection("productos").get().then(res=>{
   productos=[];
-  res.forEach(doc=>{
-    productos.push({...doc.data(), id:doc.id});
-  });
+  res.forEach(doc=>productos.push({...doc.data(),id:doc.id}));
   mostrar(productos);
  });
 }
@@ -134,14 +160,12 @@ function mostrar(lista){
   html+=`
   <div class="card">
     <b>${p.nombre}</b> - $${p.precio}<br>
-    <small>${p.descripcion}</small><br>
+    ${p.descripcion}<br>
     <img src="${p.imagen}">
-    ${p.imagen2 ? `<img src="${p.imagen2}">` : ""}
+    ${p.imagen2?`<img src="${p.imagen2}">`:""}
     <br>
     <button onclick="eliminar('${p.id}')">Eliminar</button>
-    <button onclick="editar('${p.id}')">Editar precio</button>
-  </div>
-  `;
+  </div>`;
  });
  document.getElementById("lista").innerHTML=html;
 }
@@ -151,23 +175,11 @@ function eliminar(id){
  cargar();
 }
 
-function editar(id){
- let nuevo = prompt("Nuevo precio:");
- if(!nuevo) return;
-
- db.collection("productos").doc(id).update({
-  precio:Number(nuevo)
- });
- cargar();
-}
-
 document.getElementById("buscar").addEventListener("keyup",function(){
- let f = this.value.toLowerCase();
- let filtrados = productos.filter(p=>p.nombre.toLowerCase().includes(f));
+ let f=this.value.toLowerCase();
+ let filtrados=productos.filter(p=>p.nombre.toLowerCase().includes(f));
  mostrar(filtrados);
 });
-
-cargar();
 </script>
 
 </body>
